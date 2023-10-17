@@ -8,5 +8,3 @@ document.getElementById('close-forecast')
   .addEventListener('click', () => {
     document.getElementById('forecast-container').classList.add('hidden');
   });
-
-  
