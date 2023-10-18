@@ -11,11 +11,7 @@ export const searchCities = async (term) => {
       return [];
     }
 
-    // return data.map((city) => ({
-    //   url: city.url,
-    //   name: city.name,
-    //   country: city.country,
-    // }));
+    return data;
   } catch (error) {
     console.error('Erro na busca de cidades:', error);
     return [];
