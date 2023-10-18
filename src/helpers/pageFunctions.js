@@ -116,12 +116,35 @@ export async function handleSearch(event) {
 
   const searchInput = document.getElementById('search-input');
   const searchValue = searchInput.value;
-  searchCities(searchValue);
   const waith = await searchCities(searchValue);
+  const dataWaith = await Promise.all(waith.map((city) => getWeatherByCity(city.url)));
 
   try {
-    const secondFunction = waith.map((city) => getWeatherByCity(city.url));
-    const dataWaith = await Promise.all(secondFunction);
+    const cities = document.getElementById('cities');
+    cities.innerHTML = '';
+
+    const cityElements = waith.reduce((elements, city, index) => {
+      const weather = dataWaith[index];
+
+      const cityInfo = {
+        name: city.name,
+        country: city.country,
+        temp: weather.temp,
+        condition: weather.condition,
+        icon: weather.icon,
+        url: city.url,
+      };
+
+      const cityElement = createCityElement(cityInfo);
+      elements.push(cityElement);
+
+      return elements;
+    }, []);
+
+    cityElements.forEach((element) => {
+      cities.appendChild(element);
+    });
+
     console.log(dataWaith);
   } catch (error) {
     console.error(error);
