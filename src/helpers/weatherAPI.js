@@ -10,6 +10,12 @@ export const searchCities = async (term) => {
       window.alert('Nenhuma cidade encontrada');
       return [];
     }
+
+    return data.map((city) => ({
+      url: city.url,
+      name: city.name,
+      country: city.country,
+    }));
   } catch (error) {
     console.error('Erro na busca de cidades:', error);
     return [];
