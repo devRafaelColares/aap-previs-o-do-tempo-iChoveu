@@ -76,33 +76,47 @@ export function showForecast(forecastList) {
 /**
  * Recebe um objeto com as informações de uma cidade e retorna um elemento HTML
  */
+
 export function createCityElement(cityInfo) {
-  const { name, country, temp, condition, icon /* , url */ } = cityInfo;
-
+  const { name, country, temp, condition, icon, url } = cityInfo;
   const cityElement = createElement('li', 'city');
-
   const headingElement = createElement('div', 'city-heading');
   const nameElement = createElement('h2', 'city-name', name);
   const countryElement = createElement('p', 'city-country', country);
-  headingElement.appendChild(nameElement);
-  headingElement.appendChild(countryElement);
+  headingElement.append(nameElement, countryElement);
 
   const tempElement = createElement('p', 'city-temp', `${temp}º`);
   const conditionElement = createElement('p', 'city-condition', condition);
-
   const tempContainer = createElement('div', 'city-temp-container');
-  tempContainer.appendChild(conditionElement);
-  tempContainer.appendChild(tempElement);
+  tempContainer.append(conditionElement, tempElement);
 
   const iconElement = createElement('img', 'condition-icon');
   iconElement.src = icon.replace('64x64', '128x128');
 
-  const infoContainer = createElement('div', 'city-info-container');
-  infoContainer.appendChild(tempContainer);
-  infoContainer.appendChild(iconElement);
+  const newButton = createElement('button', 'btn', 'Ver previsão');
+  newButton.addEventListener('click', async () => {
+    const TOKEN = import.meta.env.VITE_TOKEN;
+    const forecastURL = `http://api.weatherapi.com/v1/forecast.json?lang=pt&key=${TOKEN}&q=${url}&days=7`;
 
-  cityElement.appendChild(headingElement);
-  cityElement.appendChild(infoContainer);
+    try {
+      const data = await (await fetch(forecastURL)).json();
+      const formattedForecast = data.forecast.forecastday.map((day) => ({
+        date: day.date,
+        maxTemp: day.day.maxtemp_c,
+        minTemp: day.day.mintemp_c,
+        condition: day.day.condition.text,
+        icon: day.day.condition.icon.replace('64x64', '128x128'),
+      }));
+      showForecast(formattedForecast);
+    } catch (error) {
+      window.alert(`Erro ao buscar a previsão: ${error.message}`);
+    }
+  });
+
+  const infoContainer = createElement('div', 'city-info-container');
+  infoContainer.append(tempContainer, iconElement, newButton);
+
+  cityElement.append(headingElement, infoContainer);
 
   return cityElement;
 }
